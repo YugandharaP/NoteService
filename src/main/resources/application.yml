@@ -1,5 +1,0 @@
-spring:
-  application:
-    name: noteService
-server:
-  port: 8766

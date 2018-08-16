@@ -1,6 +1,5 @@
 package com.bridgelabz.noteservice.model;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -24,15 +23,22 @@ public class Note {
 	private List<MetaData> metadata;
 	private String colorCode;
 	private Date reminder;
-	private LocalDateTime createdDate;
-	private LocalDateTime lastModifiedDate;
+	private Date createdDate;
+	private Date lastModifiedDate;
 	private boolean trashStatus;
 	private boolean pinNote;
 	private boolean archiveNOte;
-
 	private List<Label> listOfLabels;
 
 	private String userId;
+
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
 
 	public String getId() {
 		return id;
@@ -56,14 +62,6 @@ public class Note {
 
 	public Date getReminder() {
 		return reminder;
-	}
-
-	public LocalDateTime getCreatedDate() {
-		return createdDate;
-	}
-
-	public LocalDateTime getLastModifiedDate() {
-		return lastModifiedDate;
 	}
 
 	public boolean isTrashStatus() {
@@ -110,14 +108,6 @@ public class Note {
 		this.reminder = reminder;
 	}
 
-	public void setCreatedDate(LocalDateTime createdDate) {
-		this.createdDate = createdDate;
-	}
-
-	public void setLastModifiedDate(LocalDateTime localDateTime) {
-		this.lastModifiedDate = localDateTime;
-	}
-
 	public void setTrashStatus(boolean trashStatus) {
 		this.trashStatus = trashStatus;
 	}
@@ -136,6 +126,14 @@ public class Note {
 
 	public void setUserId(String userId) {
 		this.userId = userId;
+	}
+
+	public Date getLastModifiedDate() {
+		return lastModifiedDate;
+	}
+
+	public void setLastModifiedDate(Date lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
 	}
 
 }

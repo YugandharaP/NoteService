@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import java.time.LocalDateTime;  
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -85,8 +84,8 @@ public class NoteServiceImplementation implements INoteService {
 			note.setReminder(date);
 		}
 		note.setUserId(userId);
-		note.setCreatedDate(LocalDateTime.now());
-		note.setLastModifiedDate(LocalDateTime.now());
+		note.setCreatedDate(new Date());
+		note.setLastModifiedDate(new Date());
 		
 		
 		List<Label> list = new ArrayList<Label>();
@@ -199,7 +198,7 @@ public class NoteServiceImplementation implements INoteService {
 		if (!notedto.getDiscription().equals("")) {
 			note.setDiscription(notedto.getDiscription());
 		}
-		note.setLastModifiedDate(LocalDateTime.now());
+		note.setLastModifiedDate(new Date());
 		noteRepository.save(note);
 		noteElasticRepository.save(note);
 	}
@@ -251,7 +250,7 @@ public class NoteServiceImplementation implements INoteService {
 
 		Note note = optionalNote.get();
 		note.setTrashStatus(false);
-		note.setLastModifiedDate(LocalDateTime.now());
+		note.setLastModifiedDate(new Date());
 		noteRepository.save(note);
 		noteElasticRepository.save(note);
 	}
@@ -689,8 +688,8 @@ public class NoteServiceImplementation implements INoteService {
    
         
         note.setMetadata(metadataList);
-		note.setCreatedDate(LocalDateTime.now());
-		note.setLastModifiedDate(LocalDateTime.now());
+		note.setCreatedDate(new Date());
+		note.setLastModifiedDate(new Date());
 		
 		noteRepository.insert(note);
 		noteElasticRepository.save(note);

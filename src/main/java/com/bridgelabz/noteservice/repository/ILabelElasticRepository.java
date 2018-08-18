@@ -1,5 +1,6 @@
 package com.bridgelabz.noteservice.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
@@ -16,5 +17,7 @@ public interface ILabelElasticRepository extends ElasticsearchRepository<Label, 
 	Label findByUserIdAndLabelName(String userId, String string);
 
 	void deleteByLabelName(String labelName);
+
+	List<Label> findAllByUserId(String userId);
 
 }

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -97,13 +98,14 @@ public class NoteController {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@GetMapping("/readallnotes")
-	public ResponseEntity<ResponseDTO> readAllNotes(HttpServletRequest request) throws ToDoExceptions {
+	public ResponseEntity<ResponseDTO> readAllNotes(HttpServletRequest request,
+												@RequestParam (required=false)String sortByTitle_sortByDate,
+												@RequestParam (required=false)String ascendingOrdescending,
+												@RequestHeader("TOKEN") String token) throws ToDoExceptions {
 			logger.info(REQUEST_ID+request.getRequestURI());	
 		
-			String userId =request.getHeader("userId");
-
-
-			List<Note> note = noteService.readAllNotes(userId);
+			String userId = (String) request.getAttribute("userId");
+			List<Note> note = noteService.readAllNotes(userId,sortByTitle_sortByDate,ascendingOrdescending);
 			logger.info(RESPONSE_ID+request.getRequestURI());
 			return new ResponseEntity(note, HttpStatus.OK);
 	}

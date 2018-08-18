@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -103,6 +104,7 @@ public class NoteServiceImplementation implements INoteService {
 				note.setListOfLabels(list);//set labels into the notes
 			}else
 			{
+				
 				if(!labelOfUser.getLabelName().equals("")){
 					list.add(labelOfUser);
 					note.setListOfLabels(list);
@@ -166,12 +168,23 @@ public class NoteServiceImplementation implements INoteService {
 	 * @throws ToDoExceptions
 	 */
 	@Override
-	public List<Note> readAllNotes(String userId) throws ToDoExceptions {
+	public List<Note> readAllNotes(String userId, String choiceOfSorting, String ascendingOrdescending) throws ToDoExceptions {
 		RestPreconditions.checkNotNull(userId, MessageSourceService.getMessage("141"));
+
 		List<Note> noteList = noteElasticRepository.findAllByUserIdAndTrashStatus(userId,false);
+		if(choiceOfSorting.equals(null)||choiceOfSorting.equalsIgnoreCase("sortByTitle")) {
+			if(ascendingOrdescending==null||ascendingOrdescending.equalsIgnoreCase("ascending"))
+			{
+				return noteList.stream().sorted(Comparator.comparing(Note::getTitle)).collect(Collectors.toList());
+			}
+			return noteList.stream().sorted(Comparator.comparing(Note::getTitle).reversed()).collect(Collectors.toList());
+		}
 		
-		RestPreconditions.checkNotNull(noteList, MessageSourceService.getMessage("153"));
-		return noteList;
+		if(ascendingOrdescending==null||ascendingOrdescending.equalsIgnoreCase("ascending"))
+		{
+			return noteList.stream().sorted(Comparator.comparing(Note::getCreatedDate)).collect(Collectors.toList());
+		}
+		return noteList.stream().sorted(Comparator.comparing(Note::getCreatedDate).reversed()).collect(Collectors.toList());
 	}
 
 	/**
@@ -594,18 +607,11 @@ public class NoteServiceImplementation implements INoteService {
 	@Override
 	public List<String> getAllLabels(String userId) throws ToDoExceptions {
 		RestPreconditions.checkNotNull(userId, MessageSourceService.getMessage("141"));
-		List<Note> listOfNotes = noteElasticRepository.findAllByUserId(userId);
-		if (listOfNotes.size() == 0) {
+		List<Label> listOfLabels = labelElasticRepository.findAllByUserId(userId);
+		if (listOfLabels.size() == 0) {
 			throw new ToDoExceptions(MessageSourceService.getMessage("153"));
 		}
-		List<String> finalLabelList = new ArrayList<String>();
-		for (int i = 0; i < listOfNotes.size(); i++) {
-			if (listOfNotes.get(i).getListOfLabels() != null) {
-				for (int j = 0; j < listOfNotes.get(i).getListOfLabels().size(); j++) {
-					finalLabelList.add(listOfNotes.get(i).getListOfLabels().get(j).getLabelName());
-				}
-			}
-		}
+		List<String> finalLabelList=listOfLabels.stream().map(streamList->streamList.getLabelName()).collect(Collectors.toList());
 		return finalLabelList;
 	}
 

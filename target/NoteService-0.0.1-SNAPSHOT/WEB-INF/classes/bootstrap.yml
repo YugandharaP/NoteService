@@ -1,0 +1,11 @@
+server:
+  port: 8600
+
+spring:
+  application:
+    name: noteService
+  cloud: 
+    config: 
+      discovery: 
+        service-id: toDoConfigServer
+      uri: http://localhost:8700

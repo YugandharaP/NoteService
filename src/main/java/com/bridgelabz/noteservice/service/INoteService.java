@@ -50,12 +50,14 @@ public interface INoteService {
 	
 	
 	/**
+	 * @param ascendingOrdescending 
+	 * @param sortByTitle_sortByDate 
 	 * @param token
 	 * @return listOfNotes
 	 * <p><b>To read all notes of perticular user id from todo application</b></p>
 	 * @throws ToDoExceptions 
 	 */
-	List<Note> readAllNotes(String userId) throws ToDoExceptions;
+	List<Note> readAllNotes(String userId, String sortByTitle_sortByDate, String ascendingOrdescending) throws ToDoExceptions;
 
 	/**
 	 * @param token

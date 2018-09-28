@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,15 +23,20 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
 import com.bridgelabz.noteservice.model.MetaData;
 import com.bridgelabz.noteservice.model.Note;
 import com.bridgelabz.noteservice.model.NoteDTO;
 import com.bridgelabz.noteservice.model.ResponseDTO;
 import com.bridgelabz.noteservice.service.IFeignClient;
 import com.bridgelabz.noteservice.service.INoteService;
+import com.bridgelabz.noteservice.service.IS3FeignClient;
 import com.bridgelabz.noteservice.utilservice.exceptions.ToDoExceptions;
 import com.bridgelabz.noteservice.utilservice.messageservice.MessageSourceService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 
 /**
@@ -51,6 +57,12 @@ public class NoteController {
    
 	@Autowired
 	private IFeignClient feignClient;
+	
+	@Autowired
+	private IS3FeignClient s3feignClient;
+	
+	@Value("${innerFolderName}")
+	String innerFolderName;
 	/**
 	 * @param token
 	 * @param notedto
@@ -58,10 +70,11 @@ public class NoteController {
 	 * @return response
 	 * @throws ToDoExceptions 
 	 * @throws ParseException 
+	 * @throws JsonProcessingException 
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PostMapping("/createnote")
-	public ResponseEntity<ResponseDTO> createNote(HttpServletRequest request ,@RequestBody NoteDTO notedto) throws ToDoExceptions, ParseException {
+	public ResponseEntity<ResponseDTO> createNote(HttpServletRequest request ,@RequestBody NoteDTO notedto) throws ToDoExceptions, ParseException, JsonProcessingException {
 		logger.info(REQUEST_ID+request.getRequestURI());
 		
 		String userId =request.getHeader("userId");
@@ -104,7 +117,7 @@ public class NoteController {
 												@RequestHeader("TOKEN") String token) throws ToDoExceptions {
 			logger.info(REQUEST_ID+request.getRequestURI());	
 		
-			String userId = (String) request.getAttribute("userId");
+			String userId = request.getHeader("userId");
 			List<Note> note = noteService.readAllNotes(userId,sortByTitle_sortByDate,ascendingOrdescending);
 			logger.info(RESPONSE_ID+request.getRequestURI());
 			return new ResponseEntity(note, HttpStatus.OK);
@@ -122,7 +135,8 @@ public class NoteController {
 	public ResponseEntity<ResponseDTO> updateNote(HttpServletRequest request,@RequestBody NoteDTO notedto) throws ToDoExceptions {
 		logger.info(REQUEST_ID+request.getRequestURI());
 		
-		String userId = (String) request.getAttribute("userId");
+		String userId = request.getHeader("userId");
+		System.out.println(userId+": userId");
 
 		noteService.updateNote(notedto, userId);
 		logger.info(RESPONSE_ID+request.getRequestURI());
@@ -234,7 +248,7 @@ public class NoteController {
 	 * @throws ToDoExceptions 
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@PutMapping("/pinnote/{boolean-value}/{noteId}")
+	@PutMapping("/pinnote/{value}/{noteId}")
 	public ResponseEntity<ResponseDTO> pinNote(HttpServletRequest request,@PathVariable String noteId,@PathVariable boolean value) throws ToDoExceptions {
 		logger.info(REQUEST_ID+request.getRequestURI());	
 		
@@ -493,7 +507,7 @@ public class NoteController {
 		noteService.removelabelfromnote(userId,noteId,labelName);
 		logger.info(RESPONSE_ID+request.getRequestURI());	
 		return new ResponseEntity(MessageSourceService.getMessage("134"), HttpStatus.OK);
-	}
+	} 
 	
 	/**
 	 * @param request
@@ -520,4 +534,30 @@ public class NoteController {
 		
 		return feignClient.getUserByEmailId(emailId);
 	}
+	
+	/**
+	 * @param token
+	 * @param folderName
+	 * @param imageFile
+	 * @param innerFolderName
+	 * <p><b></b></p>
+	 * @return response to the view
+	 * @throws AmazonServiceException
+	 * @throws AmazonClientException
+	 * @throws IOException
+	 * @throws ToDoExceptions
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@PostMapping("/uploadimage/{noteId}")
+	public ResponseEntity<?> uploadImage(@PathVariable String noteId,
+										@RequestParam MultipartFile imageFile,HttpServletRequest request) 
+										throws AmazonServiceException, AmazonClientException, IOException, ToDoExceptions {
+		String filePath=noteService.convertMultipartFileToJavaFile(imageFile);
+		String userId = request.getHeader("userId");
+		String imageUrl =  s3feignClient.uploadImage(userId, filePath, innerFolderName);
+		noteService.addImage(noteId, imageUrl);
+		return new ResponseEntity(MessageSourceService.getMessage("300")+" : "+imageUrl, HttpStatus.OK);
+	}
+	
+	
 }

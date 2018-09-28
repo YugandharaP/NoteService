@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 
 @Component
-@FeignClient(name = "userService", url="http://localhost:8765")//serviceId of userService 
+@FeignClient(name = "userService", url="http://localhost:8500")//serviceId of userService 
 public interface IFeignClient {
 	@GetMapping("user/getuserbyemailid/{emailId} ")
 	public ResponseEntity<?>getUserByEmailId(@PathVariable ("emailId")String emailId);

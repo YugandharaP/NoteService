@@ -9,3 +9,7 @@ spring:
       discovery: 
         service-id: toDoConfigServer
       uri: http://localhost:8700
+      profile: dev
+  profiles:
+    active:
+    - dev

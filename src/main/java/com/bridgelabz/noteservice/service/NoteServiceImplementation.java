@@ -1,6 +1,10 @@
 package com.bridgelabz.noteservice.service;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,11 +25,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.bridgelabz.noteservice.model.Label;
 import com.bridgelabz.noteservice.model.MetaData;
 import com.bridgelabz.noteservice.model.Note;
 import com.bridgelabz.noteservice.model.NoteDTO;
+import com.bridgelabz.noteservice.repository.IElasticRepository;
 import com.bridgelabz.noteservice.repository.ILabelElasticRepository;
 import com.bridgelabz.noteservice.repository.ILabelRepository;
 import com.bridgelabz.noteservice.repository.INoteElasticRepository;
@@ -34,6 +40,7 @@ import com.bridgelabz.noteservice.utilservice.exceptions.RestPreconditions;
 import com.bridgelabz.noteservice.utilservice.exceptions.ToDoExceptions;
 import com.bridgelabz.noteservice.utilservice.mapperservice.ModelMapperService;
 import com.bridgelabz.noteservice.utilservice.messageservice.MessageSourceService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * @author yuga
@@ -61,6 +68,9 @@ public class NoteServiceImplementation implements INoteService {
 	@Autowired
 	private ILabelElasticRepository labelElasticRepository;
 	
+	@Autowired
+	private IElasticRepository elasticRepository;
+	
 	@Value("${patternString}")
 	private String patternString;
 
@@ -70,14 +80,15 @@ public class NoteServiceImplementation implements INoteService {
 	 * <p><b>To create note for particular user id in todo application </b></p>
 	 * @throws ToDoExceptions
 	 * @throws ParseException
+	 * @throws JsonProcessingException 
 	 */
 	@Override
-	public String createNote(NoteDTO notedto, String userId) throws ToDoExceptions, ParseException {
+	public String createNote(NoteDTO notedto, String userId) throws ToDoExceptions, ParseException, JsonProcessingException {
 		System.out.println(userId);
-		RestPreconditions.checkNotNull(notedto.getTitle(), MessageSourceService.getMessage("135"));
-		RestPreconditions.checkNotNull(notedto.getDiscription(),MessageSourceService.getMessage("136"));
-
-		RestPreconditions.checkNotNull(userId,MessageSourceService.getMessage("141"));
+		RestPreconditions.checkArgument(userId.equals(""),MessageSourceService.getMessage("141"));
+		RestPreconditions.checkArgument(notedto.getTitle().equals(""), MessageSourceService.getMessage("135"));
+		RestPreconditions.checkArgument(notedto.getDiscription().equals(""),MessageSourceService.getMessage("136"));
+		
 		Note note = modelMapper.map(notedto, Note.class);
 		if (notedto.getRemainder() != "" && notedto.getRemainder() != null) {
 			Date date = new SimpleDateFormat("dd/MM/yyyy").parse(notedto.getRemainder());
@@ -113,7 +124,8 @@ public class NoteServiceImplementation implements INoteService {
 		}
 	}
 	noteRepository.insert(note);
-	noteElasticRepository.save(note);
+	//noteElasticRepository.save(note);
+	elasticRepository.save(note, note.getId());
 	return note.getId();
 }
 
@@ -126,7 +138,7 @@ public class NoteServiceImplementation implements INoteService {
 	@Override
 	public String deleteNote(String noteId, String userId) throws ToDoExceptions {
 		RestPreconditions.checkNotNull(noteId,MessageSourceService.getMessage("140"));
-		RestPreconditions.checkNotNull(userId, MessageSourceService.getMessage("141"));
+		RestPreconditions.checkArgument(userId.equals(""), MessageSourceService.getMessage("155"));
 
 		Optional<Note> optionalNote = noteElasticRepository.findById(noteId);
 		RestPreconditions.checkArgument(!optionalNote.isPresent(),
@@ -609,7 +621,7 @@ public class NoteServiceImplementation implements INoteService {
 		RestPreconditions.checkNotNull(userId, MessageSourceService.getMessage("141"));
 		List<Label> listOfLabels = labelElasticRepository.findAllByUserId(userId);
 		if (listOfLabels.size() == 0) {
-			throw new ToDoExceptions(MessageSourceService.getMessage("153"));
+			throw new ToDoExceptions(MessageSourceService.getMessage("154"));
 		}
 		List<String> finalLabelList=listOfLabels.stream().map(streamList->streamList.getLabelName()).collect(Collectors.toList());
 		return finalLabelList;
@@ -702,4 +714,39 @@ public class NoteServiceImplementation implements INoteService {
 		return metadataList;
 	}
 
+	/**
+	 * @param file
+	 * To Convert multipart file to java file
+	 * @return file
+	 * @throws IOException
+	 */
+	@Override
+	public String convertMultipartFileToJavaFile(MultipartFile file) throws IOException {
+	    File convFile = new File(file.getOriginalFilename());
+	    @SuppressWarnings("unused")
+		String filename = file.getOriginalFilename();
+	    convFile.createNewFile();
+	    FileOutputStream fos = new FileOutputStream(convFile);
+	    fos.write(file.getBytes());
+	    fos.close();
+	    return convFile.getAbsolutePath();
+	}
+	/* (non-Javadoc)
+	 * @see com.bridgelabz.noteservice.service.INoteService#addImage(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void addImage(String noteId, String imageUrl) throws ToDoExceptions, MalformedURLException {
+		RestPreconditions.checkNotNull(noteId, MessageSourceService.getMessage("140"));
+		Optional<Note> optionalNote = noteRepository.findById(noteId);
+		Note note = optionalNote.get();
+		List<URL>imageList= note.getImageList();
+		if(imageList==null) {
+			imageList=new ArrayList<URL>();
+		}
+		URL url=new URL(imageUrl);
+		imageList.add(url);
+		note.setImageList(imageList);
+		noteRepository.save(note);
+		noteElasticRepository.save(note);
+	}
 }

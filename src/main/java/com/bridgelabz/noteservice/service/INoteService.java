@@ -1,13 +1,17 @@
 package com.bridgelabz.noteservice.service;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.bridgelabz.noteservice.model.MetaData;
 import com.bridgelabz.noteservice.model.Note;
 import com.bridgelabz.noteservice.model.NoteDTO;
 import com.bridgelabz.noteservice.utilservice.exceptions.ToDoExceptions;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 
 /**
@@ -28,8 +32,9 @@ public interface INoteService {
 	 *removelabelfromnoteremovelabelfromnote
 	 * @throws ToDoExceptions 
 	 * @throws ParseException 
+	 * @throws JsonProcessingException 
 	 */
-	String createNote(NoteDTO notedto, String userId) throws ToDoExceptions, ParseException;
+	String createNote(NoteDTO notedto, String userId) throws ToDoExceptions, ParseException, JsonProcessingException;
 
 	/**
 	 * @param noteId @param token
@@ -232,6 +237,22 @@ public interface INoteService {
 	 * @throws ToDoExceptions 
 	 */
 	List<MetaData> getMetaData(String userId, NoteDTO notedto) throws IOException, ToDoExceptions;
+
+
+	/**
+	 * @param imageFile
+	 * @return String filePath
+	 * @throws IOException 
+	 */
+	String convertMultipartFileToJavaFile(MultipartFile imageFile) throws IOException;
+
+	/**
+	 * @param token
+	 * @param imageUrl
+	 * @throws ToDoExceptions 
+	 * @throws MalformedURLException 
+	 */
+	void addImage(String token, String imageUrl) throws ToDoExceptions, MalformedURLException;
 
 	
 	

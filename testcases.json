@@ -1,0 +1,173 @@
+{
+	"noteModels": [
+		{
+			"type": "NEW_CREATE_NOTE",
+			"title": "SEPT26",
+			"discription": "today is Wedensday",
+			"reminder": "",
+			"labelNameList": [],
+			"metadata": [],
+			"imageList": [],
+			"userId": "5b9f31acf4b4301b740edd02"
+		},
+		{
+			"type": "NEW_EMPTY_TOKEN",
+			"userId": "",
+			"title": "SEPT26",
+			"discription": "today is Wedensday"
+		},
+		{
+			"type": "NEW_EMPTY_TITLE",
+			"title": "",
+			"discription": "today is Wedensday",
+			"userId": "5b9f31acf4b4301b740edd02"
+		},
+		{
+			"type": "NEW_EMPTY_DESCRIPTION",
+			"title": "SEPT26",
+			"discription": "",
+			"userId": "5b9f31acf4b4301b740edd02"
+		},
+		{
+			"type": "DELETE_NOTE",
+			"userId": "5b9f31acf4b4301b740edd02"
+		},
+		{
+			"type": "DELETE_NOTE_EMPTY_NOTEID",
+			
+			"userId": "5b9f31acf4b4301b740edd02"
+		},
+		{
+			"type": "DELETE_NOTE_EMPTY_TOKEN",
+			"userId": ""
+		},
+		{
+			"type": "DELETE_NON_CREATED_NOTE",
+			"userId": "5b9f31acf4b4301b740edd02"
+		},
+		{
+			"type": "DELETE_FROM_TRASH",
+			"userId": "5b9f31acf4b4301b740edd02",
+			"trashStatus": "true"
+		},
+		{
+			"type": "DELETE_INVALID_NOTE_FROM_TRASH",
+			"userId": "5b9f31acf4b4301b740edd02",
+			"trashStatus": "false"
+		}
+	],
+	"noteTestCases": [
+		{
+			"id": 1,
+			"statusCode": 200,
+			"validErrorCode": 404,
+			"type": "HAPPY_SCENARIO",
+			"urlPath": "/notes/createnote",
+			"category": "CREATE_NOTE",
+			"testCaseModal": "NEW_CREATE_NOTE",
+			"responseMessage": "Successful : Note successfully created.",
+			"validErrorMessage": "Note creation successfull",
+			"purpose": "Note creation successfull",
+			"useToken": "true"
+		},
+		{
+			"id": 2,
+			"statusCode": 400,
+			"type": "SAD_SCENARIO",
+			"urlPath": "/notes/createnote",
+			"category": "CREATE_NOTE",
+			"testCaseModal": "NEW_EMPTY_TOKEN",
+			"responseMessage": "NULLPointerException : User id not present in database.",
+			"purpose": "Note creation successfull",
+			"useToken": "true"
+		},
+		{
+			"id": 3,
+			"statusCode": 400,
+			"type": "SAD_SCENARIO",
+			"urlPath": "/notes/createnote",
+			"category": "CREATE_NOTE",
+			"testCaseModal": "NEW_CREATE_NOTE",
+			"responseMessage": "NullPoiunterException : Note title should not be null.",
+			"purpose": "Note creation successfull",
+			"useToken": "true"
+		},
+		{
+			"id": 4,
+			"statusCode": 400,
+			"type": "SAD_SCENARIO",
+			"urlPath": "/notes/createnote",
+			"category": "CREATE_NOTE",
+			"testCaseModal": "NEW_EMPTY_DESCRIPTION",
+			"responseMessage": "NullPoiunterException : Note description not be null.",
+			"purpose": "Note creation successfull",
+			"useToken": "true"
+		},
+		{
+			"id": 5,
+			"statusCode": 200,
+			"type": "HAPPY_SCENARIO",
+			"urlPath": "/notes/deletenote/5bacd68320ecea1ac21a2f9c",
+			"category": "DELETE_NOTE",
+			"testCaseModal": "DELETE_NOTE",
+			"responseMessage": "Successful : Note has been deleted successfully.",
+			"purpose": "Note deletion successfull",
+			"useToken": "true"
+		},
+		{
+			"id": 6,
+			"statusCode": 400,
+			"type": "SAD_SCENARIO",
+			"urlPath": "/notes/deletenote/",
+			"category": "DELETE_NOTE",
+			"testCaseModal": "DELETE_NOTE_EMPTY_NOTEID",
+			"responseMessage": "NullPointerException : Note id should not be null.",
+			"purpose": "Note deletion successfull",
+			"useToken": "true"
+		},
+		{
+			"id": 7,
+			"statusCode": 400,
+			"type": "SAD_SCENARIO",
+			"urlPath": "/notes/deletenote/5bacd67820ecea1ac21a2f9b",
+			"category": "DELETE_NOTE",
+			"testCaseModal": "DELETE_NOTE_EMPTY_TOKEN",
+			"responseMessage": "NULLPointerException : User id should not be null.",
+			"purpose": "Note deletion successfull",
+			"useToken": "true"
+		},
+		{
+			"id": 8,
+			"statusCode": 400,
+			"type": "SAD_SCENARIO",
+			"urlPath": "/notes/deletenote/2",
+			"category": "DELETE_NOTE",
+			"testCaseModal": "DELETE_NON_CREATED_NOTE",
+			"responseMessage": "NULLPointerException : Note id not present in database.",
+			"purpose": "Note deletion successfull",
+			"useToken": "true"
+		},
+		{
+			"id": 9,
+			"statusCode": 400,
+			"type": "HAPPY_SCENARIO",
+			"urlPath": "/notes/permanentdelete/5bacd68320ecea1ac21a2f9c",
+			"category": "DELETE_NOTE",
+			"testCaseModal": "DELETE_FROM_TRASH",
+			"responseMessage": "Successful : Note has been permanently deleted.",
+			"purpose": "Delete note from trash.",
+			"useToken": "true"
+		},
+		{
+			"id": 10,
+			"statusCode": 400,
+			"type": "SAD_SCENARIO",
+			"urlPath": "/notes/permanentdelete/5bacd67820ecea1ac21a2f9b",
+			"category": "DELETE_NOTE",
+			"testCaseModal": "DELETE_INVALID_NOTE_FROM_TRASH",
+			"responseMessage": "NullPointerException : Note id not present in trash.",
+			"purpose": "Delete note from trash.",
+			"useToken": "true"
+		}
+	]
+}

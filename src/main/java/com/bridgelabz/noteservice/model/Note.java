@@ -1,5 +1,6 @@
 package com.bridgelabz.noteservice.model;
 
+import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +29,8 @@ public class Note {
 	private boolean trashStatus;
 	private boolean pinNote;
 	private boolean archiveNOte;
+	//private List<String> imageUrl;
+	private List<URL>imageList;
 	private List<Label> listOfLabels;
 
 	private String userId;
@@ -64,6 +67,14 @@ public class Note {
 		return reminder;
 	}
 
+	/*public List<String> getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(List<String> imageUrl) {
+		this.imageUrl = imageUrl;
+	}*/
+
 	public boolean isTrashStatus() {
 		return trashStatus;
 	}
@@ -78,6 +89,14 @@ public class Note {
 
 	public List<Label> getListOfLabels() {
 		return listOfLabels;
+	}
+
+	public List<URL> getImageList() {
+		return imageList;
+	}
+
+	public void setImageList(List<URL> imageList) {
+		this.imageList = imageList;
 	}
 
 	public String getUserId() {

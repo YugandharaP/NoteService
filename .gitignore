@@ -18,6 +18,7 @@
 *.jar
 *.rar
 *.tar
+*.war
 *.zip
 
 # Logs and databases #
